@@ -45,7 +45,7 @@ Once this software is installed, perform the following steps before running the 
 
 1. In the root folder of this repository, create the folder `data\db`. This will be the directory for the content of the MongoDB database.
 2. In the folder [backend](./backend/) run the following command to install all relevant python packages: `pip install -r requirements.pip`.
-3. in the folder [frontend](./frontend/) run the following command to install all relevant node packages `npm install --dev`.
+3. in the folder [frontend](./frontend/) run the following command to install all relevant node packages `npm install --include=dev`.
 
 #### Starting the application
 
