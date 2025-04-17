@@ -12,13 +12,13 @@ def mock_dao():
 def user_controler(mock_dao):
   return UserController(dao = mock_dao())
 
-@pytest.fixtures
+@pytest.fixture
 def one_user():
   return {name:"Dao Duner", email:"dao.duner@domain.host"}
 
-@pytest.fixtures
+@pytest.fixture
 def two_users():
-  return [{name:"Dao Duner", email:"dao.duner@domain.host"}, {name:"Dao1 Duner1", email:"dao.duner@domain.host"}]
+  return [{firstName:"Dao", lastName: "Duner", email:"dao.duner@domain.host"}, {firstName:"Dao1", lastName: "Duner1", email:"dao.duner@domain.host"}]
 
 @pytest.fixture
 def invalid_email():
@@ -37,7 +37,6 @@ def test_valid_email_no_users(user_controller, invalid_email):
             with self.assertRaises(ValueError):
                 self.controller.get_user_by_email(invalid_email())
 
-
 def test_valid_email_no_users(user_controller, mock_dao):
   # Create value that returns mock_dao
   mock_dao().find.return_value = []
@@ -52,7 +51,6 @@ def test_valid_email_one_user():
   # Assert result
   with patch('re.fullmatch', return_value=True):
     result = self.user_controller.get_user_by_email(self.user.email)
-    assert result.isObjeckt()
     assert result == self.user
 
 def test_valid_email_several_user():
