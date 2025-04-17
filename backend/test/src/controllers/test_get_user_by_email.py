@@ -60,3 +60,13 @@ def test_valid_email_several_user():
   with patch('re.fullmatch', return_value=True):
       result = self.user_controller.get_user_by_email(self.user.email)
       assert result == self.user
+
+def test_database_failure_raises_exception():
+  # Simulate the DAO throwing an exception
+  # and test if the exception will be raised by the tested method 
+
+  self.mock_dao.find.side_effect = Exception("Database failure")
+
+  with patch('re.fullmatch', return_value=True):
+    with pytest.raises(Exception, match="Database failure"):
+      self.user_controller.get_user_by_email(self.user.email)
