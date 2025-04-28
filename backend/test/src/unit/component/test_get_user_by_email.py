@@ -54,12 +54,15 @@ def valid_email():
 
 # TEST CASES for get_user_by_email
 # C1
+@pytest.mark.unit
 def test_invalid_email(user_controller, invalid_email):
   # test if ValueError rises with invalid email
    with patch('re.fullmatch', return_value=False):
     with pytest.raises(ValueError):
         user_controller.get_user_by_email(invalid_email)
+
 # C2
+@pytest.mark.unit
 def test_valid_email_no_users(user_controller, mock_dao, valid_email):
   # test if None return with no users having valid email
   # Create value that returns mock_dao
@@ -69,6 +72,7 @@ def test_valid_email_no_users(user_controller, mock_dao, valid_email):
     assert result == None
 
 # C3
+@pytest.mark.unit
 def test_valid_email_one_user(user_controller, mock_dao, valid_email, one_user):
   # Create value that returns mock_dao
   mock_dao.find.return_value = one_user
@@ -79,6 +83,7 @@ def test_valid_email_one_user(user_controller, mock_dao, valid_email, one_user):
     assert result == one_user[0]
 
 # C4-1
+@pytest.mark.unit
 def test_valid_email_several_user(user_controller, mock_dao, valid_email, two_users):
   # Create value that returns mock_dao
   mock_dao.find.return_value = two_users
@@ -89,6 +94,7 @@ def test_valid_email_several_user(user_controller, mock_dao, valid_email, two_us
       assert result == two_users[0]
 
 # C4-2
+@pytest.mark.unit
 def test_valid_email_several_user_prints_warning(user_controller, mock_dao, valid_email, two_users):
     # Simulate the DAO returning more than one user
     mock_dao.find.return_value = two_users
@@ -102,7 +108,8 @@ def test_valid_email_several_user_prints_warning(user_controller, mock_dao, vali
         assert "more than one user found with mail" in captured_output.getvalue()
         assert valid_email in captured_output.getvalue()
   
-# C5      
+# C5
+@pytest.mark.unit
 def test_database_failure_raises_exception(user_controller, mock_dao,valid_email):
   # Simulate the DAO throwing an exception
   mock_dao.find.side_effect = Exception("Database failure")
@@ -112,6 +119,8 @@ def test_database_failure_raises_exception(user_controller, mock_dao,valid_email
     with pytest.raises(Exception, match="Database failure"):
       user_controller.get_user_by_email(valid_email)
 
+#C6
+@pytest.mark.unit
 def test_valid_email_several_user_prints_warning(user_controller, mock_dao, valid_email, two_users):
     # Simulate the DAO returning more than one user
     mock_dao.find.return_value = two_users

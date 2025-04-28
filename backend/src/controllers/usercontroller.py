@@ -44,3 +44,4 @@ class UserController(Controller):
             return update_result
         except Exception as e:
             raise
+        
