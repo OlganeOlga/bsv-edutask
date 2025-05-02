@@ -36,7 +36,8 @@ describe('Logging into the system', () => {
     // detect a div which contains "Email Address", find the input and type (in a declarative way)
     cy.contains('div', 'Email Address')
       .find('input[type=text]')
-      .type(email)
+      .type('mon.doe@gmail.com')
+      //.type(email)
     // alternative, imperative way of detecting that input field
     //cy.get('.inputwrapper #email')
     //    .type(email)
@@ -49,6 +50,11 @@ describe('Logging into the system', () => {
     cy.get('h1')
       .should('contain.text', 'Your tasks, ' + name)
   })
+
+  // it('email field enabled', ()=> {
+  //   cy.get('inputwrapper #email')
+  //     .should('be.disabled')
+  // })
 
   after(function () {
     // clean up by deleting the user from the database
