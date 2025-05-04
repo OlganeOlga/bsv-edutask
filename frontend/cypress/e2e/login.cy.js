@@ -3,6 +3,7 @@ describe('Logging into the system', () => {
   let uid // user id
   let name // name of the user (firstName + ' ' + lastName)
   let email // email of the user
+  let tasks
 
   before(function () {
     // create a fabricated user from a fixture
@@ -17,11 +18,14 @@ describe('Logging into the system', () => {
           uid = response.body._id.$oid
           name = user.firstName + ' ' + user.lastName
           email = user.email
+          tasks = user.tasks
         })
       })
   })
 
   beforeEach(function () {
+    cy.clearCookies();  // Clear cookies before the test runs
+    cy.clearLocalStorage();  // Optionally clear local storage as well
     // enter the main main page
     cy.visit('http://localhost:3000')
   })
@@ -37,10 +41,7 @@ describe('Logging into the system', () => {
     cy.contains('div', 'Email Address')
       .find('input[type=text]')
       .type('mon.doe@gmail.com')
-      //.type(email)
-    // alternative, imperative way of detecting that input field
-    //cy.get('.inputwrapper #email')
-    //    .type(email)
+      
 
     // submit the form on this page
     cy.get('form')
@@ -49,7 +50,30 @@ describe('Logging into the system', () => {
     // assert that the user is now logged in
     cy.get('h1')
       .should('contain.text', 'Your tasks, ' + name)
+  
+    cy.get('.container-element').first().should('exist');
   })
+
+  it('does task exists', () => {
+    // detect a div which contains "Email Address", find the input and type (in a declarative way)
+    cy.contains('div', 'Email Address')
+      .find('input[type=text]')
+      .type('mon.doe@gmail.com')
+
+    // submit the form on this page
+    cy.get('form')
+      .submit()
+
+    // assert that the user is now logged in
+    cy.get('h1')
+      .should('contain.text', 'Your tasks, ' + name)
+  
+    cy.get('p')
+      .should('contain.text', 
+        'Start by pasting the view key of a YouTube video as well as a title of the task in the form below');
+  })
+
+
 
   // it('email field enabled', ()=> {
   //   cy.get('inputwrapper #email')
