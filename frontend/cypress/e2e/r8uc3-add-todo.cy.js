@@ -43,36 +43,29 @@ describe('R8UC3 - Add todo item3', () => {
         cy.clearLocalStorage();
         cy.visit('http://localhost:3000')
         cy.contains('div', 'Email Address').find('input[type=text]').type('user.doe@gmail.com')
-            cy.get('form').submit()
-        cy.get('.container-element').first().should('exist').click();
-        // Delete all existing todos (optional but clean)
-        cy.get('ul.todo-list > li.todo-item').each(($el) => {
-           
-            cy.wrap($el).find('.remover').click({ force: true });
-        });
-  
-        // Add one todo to work with
-        cy.get('form.inline-form > input[type="text"]').type('A new todo');
-        cy.get('form.inline-form > input[type="submit"]').click();
-         
+        cy.get('form').submit()
+
+        cy.get('img').last().click();         
     })
 
     it('R8UC3_1: x symbol behind the description of the todo item', () => {
-        cy.get('ul.todo-list > li.todo-item').first() 
+        cy.get('ul.todo-list > li.todo-item').last() 
         // Ensure the "x" symbol exists behind the description (positioned properly)
         .find('.remover')
         .should('exist')
     })
     
     it('R8UC3_2: The todo item is removed from the todo list', () => {
-        cy.get('ul.todo-list > li.todo-item').should('have.length.at.least', 1); // Optional: ensure item exists first
-
-        cy.get('ul.todo-list > li.todo-item').each(($el) => {
+        cy.get('ul.todo-list > li.todo-item').then($items => {
+            const initialCount = $items.length;
            
-            cy.wrap($el).find('.remover').debug().click({ force: true });
+            cy.get('.remover').should('exist')
+            .dblclick({ force: true });
+            
+            cy.get('ul.todo-list > li.todo-item')
+            .should('have.length', initialCount - 1);
         });
 
-        cy.get('ul.todo-list > li.todo-item').should('not.exist');
     })
 
     after(function () {
@@ -84,5 +77,4 @@ describe('R8UC3 - Add todo item3', () => {
         cy.log(response.body)
         })
     })
-
 })

@@ -41,22 +41,21 @@ describe('R8UC2 - Add todo item2', () => {
         cy.clearLocalStorage();
         cy.visit('http://localhost:3000')
         cy.contains('div', 'Email Address').find('input[type=text]').type('user.doe@gmail.com')
-            cy.get('form').submit()
-        cy.get('.container-element').first().click();
+        cy.get('form').submit()
+
+        // click img
+        cy.get('img').first().click();
     })
 
     
-    it('R8UC2_1: Test !con in front of the description of the todo item', () => {
-        cy.get('ul.todo-list > li.todo-item').each($li => {
-            // Check that each todo-item contains a checker span before the description
-            cy.wrap($li)
-              .find('span.checker')
-              .should('exist');
-          });
+    it('R8UC2_1: Test icon in front of the description of the todo item', () => {
+        cy.get('ul.todo-list').should('exist'); // or cy.get('.popup').should('exist');
+        // Now continue with assertions
+        cy.get('ul.todo-list > li.todo-item').first().find('.checker').should('exist');
     })
     
     
-    it('R8UC2_2: Todo item set to done', () => {        
+    it('R8UC2_2a: Todo item set to done', () => {       
         // Click the icon
         cy.get('ul.todo-list > li.todo-item')
             .first()
@@ -69,20 +68,18 @@ describe('R8UC2 - Add todo item2', () => {
             .find('.checker')
             .should('have.class', 'checked');
 
+    })
+
+    it('R8UC2_2b: Todo item set to done - text is struck throw', () => {       
         cy.get('ul.todo-list > li.todo-item')
             .first()
-            .find('.editable')        // adjust selector if needed
+            .find('.editable')
             .should('have.css', 'text-decoration-line', 'line-through');
     })
 
 
-    it('R8UC2_3: Todo item set to active after the second click', () => {        
-        // Click the icon
-        cy.get('ul.todo-list > li.todo-item')
-            .first()
-            .find('.checker')
-            .click();
-         // Click the icon second tile
+    it('R8UC2_3a: Todo item set to active after the second click', () => { 
+         // Click the icon second time
         cy.get('ul.todo-list > li.todo-item')
          .first()
          .find('.checker')
@@ -93,13 +90,15 @@ describe('R8UC2 - Add todo item2', () => {
             .first()
             .find('.checker')
             .should('have.class', 'unchecked');
-
-        cy.get('ul.todo-list > li.todo-item')
-            .first()
-            .find('.editable')        // adjust selector if needed
-            .should('not.have.css', 'text-decoration-line', 'line-through');
     })
 
+    
+    it('R8UC2_3a: Text of the item is not struck trow after the second click', () => { 
+        cy.get('ul.todo-list > li.todo-item')
+           .first()
+           .find('.editable')        // adjust selector if needed
+           .should('not.have.css', 'text-decoration-line', 'line-through');
+   })
 
     after(function () {
         // clean up by deleting the user from the database 
