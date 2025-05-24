@@ -8,13 +8,14 @@ import sys
 
 # import UserController to test it's method
 from src.controllers.usercontroller import UserController
+from src.util.dao import DAO
 
 # Mock DAO
 @pytest.fixture
 def mock_dao(): 
   return MagicMock()
 
-# Mock userController object
+# Initiate userController object
 @pytest.fixture
 def user_controller(mock_dao):
   return UserController(dao = mock_dao)
@@ -43,29 +44,42 @@ def two_users():
     
     return [user1, user2]
 
-@pytest.fixture
-def invalid_email():
-    return "invalid-email"
+# create arrau of invalid emails
+@pytest.fixture(params=[
+    "invalidemail"
+    "invalid-email"
+    "@invalid-email",
+    "invalid-email@",
+    "invalid@email.",
+    "invalid@email",
+    "invalid@em..ail"
+])
+def invalid_email(request):
+    return request.param
 
 @pytest.fixture
 def valid_email():
     return "dao.duner@domain.host"
 
-# TEST CASES for get_user_by_email
-# C1
-@pytest.mark.unit
-def test_invalid_email(user_controller, invalid_email):
-  # test if ValueError rises with invalid email
-  with pytest.raises(ValueError):
-      user_controller.get_user_by_email(invalid_email)
+@pytest.fixture
+def valid_vrong_email():
+    return "dao5.duner@domain.host"
 
-# C2
+# TEST CASES for get_user_by_email
+
+# TC1
 @pytest.mark.unit
-def test_valid_email_no_users(user_controller, mock_dao, valid_email):
+def test_valid_email(user_controller, valid_email):
+    user_controller.get_user_by_email(valid_email)
+    user_controller.dao.find.assert_called_once_with({'email': valid_email})
+
+#TC2
+@pytest.mark.unit
+def test_valid_email_no_users(user_controller, mock_dao, valid_vrong_email):
   # test if None return with no users having valid email
   # Create value that returns mock_dao
   mock_dao.find.return_value = []
-  result = user_controller.get_user_by_email(valid_email)
+  result = user_controller.get_user_by_email(valid_vrong_email)
   assert result == None
 
 # C3
@@ -79,26 +93,26 @@ def test_valid_email_one_user(user_controller, mock_dao, valid_email, one_user):
   assert result == one_user[0]
 
 # C4-1
-@pytest.mark.unit
-def test_valid_email_several_user(user_controller, mock_dao, valid_email, two_users):
-  # Create value that returns mock_dao
-  mock_dao.find.return_value = two_users
-  # Assert result
-  result = user_controller.get_user_by_email(valid_email)
-  print(result)
-  assert result == two_users[0]
-
-# C4-2
+# Assert that warning message is printes with multiple users
 @pytest.mark.unit
 def test_warning_printed_when_multiple_users_found(user_controller, mock_dao, valid_email, two_users):
     mock_dao.find.return_value = two_users
-
     captured_output = io.StringIO()
     sys.stdout = captured_output  # Redirect stdout
     user_controller.get_user_by_email(valid_email)
     sys.stdout = sys.__stdout__  # Reset stdout
     output = captured_output.getvalue()
     assert f"more than one user found with mail {valid_email}" in output
+
+# C4-2
+# Assert that first user is returned if mulptiple users detected
+@pytest.mark.unit
+def test_valid_email_several_user(user_controller, mock_dao, valid_email, two_users):
+  # Create value that returns mock_dao
+  mock_dao.find.return_value = two_users
+  # Assert result
+  result = user_controller.get_user_by_email(valid_email)
+  assert result == two_users[0]
 
 # C5
 @pytest.mark.unit
@@ -109,17 +123,10 @@ def test_database_failure_raises_exception(user_controller, mock_dao, valid_emai
   # and test if the exception will be raised by the tested method 
   with pytest.raises(Exception, match="Database failure"):
     user_controller.get_user_by_email(valid_email)
-
-#C6
-@pytest.mark.unit
-def test_valid_email_several_user_prints_warning(user_controller, mock_dao, valid_email, two_users):
-    # Simulate the DAO returning more than one user
-    mock_dao.find.return_value = two_users
-    # assert if output match expected
-    captured_output = io.StringIO()
-    sys.stdout = captured_output  # redirect stdout
-    user_controller.get_user_by_email(valid_email)
-    sys.stdout = sys.__stdout__  # reset redirect
-    assert "more than one user found with mail" in captured_output.getvalue()
-    assert valid_email in captured_output.getvalue()
     
+# TC6
+@pytest.mark.unit
+def test_invalid_email(user_controller, invalid_email):
+  # test if ValueError rises with invalid email
+  with pytest.raises(ValueError):
+    user_controller.get_user_by_email(invalid_email)

@@ -3,6 +3,9 @@ from src.util.dao import DAO
 
 import re
 emailValidator = re.compile(r'.*@.*')
+#emailValidator = re.compile(
+#     r'^(?!.*\.\.)[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+#     )
 
 class UserController(Controller):
     def __init__(self, dao: DAO):
